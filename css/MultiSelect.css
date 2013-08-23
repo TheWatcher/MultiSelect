@@ -5,26 +5,67 @@
 	display: block;
 	position: relative;
 }
+
 .MultiSelect .monitor {
-	background: url("img/mac/monitor-left.png") top left no-repeat;
 	width: 99%;
 	line-height: 18px;
 	padding: 0 0 0 4px;
 	margin: 0;
 	overflow: hidden;
 }
+.MultiSelect.mac .monitor {
+	background: url("img/mac/monitor-left.png") top left no-repeat;
+}
+.MultiSelect.win .monitor {
+	background: url("img/win/monitor-left.png") top left no-repeat;
+}
+.MultiSelect.chromelike .monitor {
+	background: url("img/chromelike/monitor-left.png") top left no-repeat;
+    line-height: 20px;
+}
+
 .MultiSelect .monitor div {
-	background: url("img/mac/monitor-right.png") top right no-repeat;
 	padding: 0 18px 0 0;
 }
+.MultiSelect.mac .monitor div {
+	background: url("img/mac/monitor-right.png") top right no-repeat;
+}
+.MultiSelect.win .monitor div {
+	background: url("img/win/monitor-right.png") top right no-repeat;
+}
+.MultiSelect.chromelike .monitor div {
+	background: url("img/chromelike/monitor-right.png") top right no-repeat;
+    padding: 0 20px 0 0;
+}
+
 .MultiSelect .monitor div div {
-	background: url("img/mac/monitor-center.png") top left repeat-x;
 	padding: 1px 0 0 0;
 	margin: 0;
 }
-.MultiSelect .monitor.active { background: url("img/mac/monitor-left-active.png") top left no-repeat; }
-.MultiSelect .monitor.active div { background: url("img/mac/monitor-right-active.png") top right no-repeat; }
-.MultiSelect .monitor.active div div { background: url("img/mac/monitor-center-active.png") top right repeat-x; }
+.MultiSelect.mac .monitor div div {
+	background: url("img/mac/monitor-center.png") top left repeat-x;
+}
+.MultiSelect.win .monitor div div {
+	background: url("img/win/monitor-center.png") top left repeat-x;
+}
+.MultiSelect.chromelike .monitor div div {
+	background: url("img/chromelike/monitor-center.png") top left repeat-x;
+}
+
+.MultiSelect.mac .monitor.active { background: url("img/mac/monitor-left-active.png") top left no-repeat; }
+.MultiSelect.mac .monitor.active div { background: url("img/mac/monitor-right-active.png") top right no-repeat; }
+.MultiSelect.mac .monitor.active div div { background: url("img/mac/monitor-center-active.png") top right repeat-x; }
+
+.MultiSelect.win .monitor.active { background: url("img/win/monitor-left-active.png") top left no-repeat; }
+.MultiSelect.win .monitor.active div { background: url("img/win/monitor-right-active.png") top right no-repeat; }
+.MultiSelect.win .monitor.active div div { background: url("img/win/monitor-center-active.png") top right repeat-x; }
+
+.MultiSelect.chromelike .monitor.active { background: url("img/chromelike/monitor-left-active.png") top left no-repeat; }
+.MultiSelect.chromelike .monitor.active div { background: url("img/chromelike/monitor-right-active.png") top right no-repeat; }
+.MultiSelect.chromelike .monitor.active div div { background: url("img/chromelike/monitor-center-active.png") top right repeat-x; }
+.MultiSelect.chromelike .monitor:hover { background: url("img/chromelike/monitor-left-hover.png") top left no-repeat; }
+.MultiSelect.chromelike .monitor:hover div { background: url("img/chromelike/monitor-right-hover.png") top right no-repeat; }
+.MultiSelect.chromelike .monitor:hover div div { background: url("img/chromelike/monitor-center-hover.png") top right repeat-x; }
 
 .MultiSelect ul {
 	position: absolute;
@@ -49,10 +90,7 @@
 }
 .MultiSelect ul li.hover,
 .MultiSelect ul li.selected.hover {
-	background-color: #6DBAF0;
-	color: white;
+	background-color: #C8DAF7;
 }
 .MultiSelect ul li.selected {
-	background-color: #3875D7;
-	color: white;
 }
