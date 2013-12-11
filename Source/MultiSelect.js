@@ -215,7 +215,7 @@ var MultiSelect = new Class({
 
             var text = sel_list.join(', ');
 
-            if(text.length > this.options.maxMonitorText) {
+            if(this.options.maxMonitorText && (text.length > this.options.maxMonitorText)) {
                 text = text.substr(0, this.options.maxMonitorText - 3) + "...";
             }
 
