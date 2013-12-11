@@ -33,7 +33,7 @@ var MultiSelect = new Class({
         itemSelectedClass: 'selected',    // list item selected CSS class
         itemHoverClass: 'hover',        // list item hover CSS class - usually we would use CSS :hover pseudo class, but we need this for keyboard navigation functionality
         maxMonitorText: 16,
-
+        emptyText: "Select options...",
     },
 
     initialize: function(selector, options) {
@@ -221,7 +221,7 @@ var MultiSelect = new Class({
 
             return text;
         } else {
-            return "Select options...";
+            return this.options.emptyText;
         }
     },
 
