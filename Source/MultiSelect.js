@@ -5,6 +5,7 @@ description:
 
 authors:
   - Blaž Maležič (http://twitter.com/blazmalezic)
+  - Chris Page (http://www.starforge.co.uk)
 
 version:
   - 1.3.1
@@ -24,16 +25,21 @@ var MultiSelect = new Class({
     Implements: [Options,Events],
 
     options: {
-        boxes: 'input[type=checkbox]',     // checkbox selector
-        labels: 'label',                 // label selector
-        monitorText: ' selected',        // monitor text (localization)
-        containerClass: 'MultiSelect',     // element container CSS class
+        boxes: 'input[type=checkbox]',  // checkbox selector
+        labels: 'label',                // label selector
+        monitorText: ' selected',       // monitor text (localization)
+        containerClass: 'MultiSelect',  // element container CSS class
         monitorClass: 'monitor',        // monitor CSS class
-        monitorActiveClass: 'active',    // monitor open CSS class
-        itemSelectedClass: 'selected',    // list item selected CSS class
+        monitorActiveClass: 'active',   // monitor open CSS class
+        itemSelectedClass: 'selected',  // list item selected CSS class
         itemHoverClass: 'hover',        // list item hover CSS class - usually we would use CSS :hover pseudo class, but we need this for keyboard navigation functionality
-        maxMonitorText: 16,
-        emptyText: "Select options...",
+        maxMonitorText: 16,             // How long, in characters, should the monitor text be
+        emptyText: "Select options..."  // String used when no options are set
+        /* Events:
+        onItemChanged:  Fired whenever a checkbox in the list is changed
+        onListOpen:     Fired after the list is opened
+        onListClose:    Fired after the list is closed (regardless of whether any changes have happened)
+        */
     },
 
     initialize: function(selector, options) {
@@ -263,6 +269,8 @@ var MultiSelect = new Class({
             this.itemHover(list, 'first');
 
             this.state = 'opened';
+
+            this.fireEvent('listOpen', monitor.getParent());
         }
         else {
             // close all MultiSelect menus
@@ -271,6 +279,8 @@ var MultiSelect = new Class({
 
             this.action = 'open';
             this.state = 'closed';
+
+            this.fireEvent('listClose', monitor.getParent());
         }
 
         if (list.getScrollSize().y > (list.getStyle('max-height').toInt() ? list.getStyle('max-height').toInt() : list.getStyle('height').toInt()))
