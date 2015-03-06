@@ -34,7 +34,8 @@ var MultiSelect = new Class({
         itemSelectedClass: 'selected',  // list item selected CSS class
         itemHoverClass: 'hover',        // list item hover CSS class - usually we would use CSS :hover pseudo class, but we need this for keyboard navigation functionality
         maxMonitorText: 16,             // How long, in characters, should the monitor text be
-        emptyText: "Select options..."  // String used when no options are set
+        emptyText: "Select options...", // String used when no options are set
+        maxHeight: undefined            // How tall can the multiselect box be? undef = use css default
         /* Events:
         onItemChanged:  Fired whenever a checkbox in the list is changed
         onListOpen:     Fired after the list is opened
@@ -71,9 +72,14 @@ var MultiSelect = new Class({
         var boxes = element.getElements(self.options.boxes);
         var labels = element.getElements(self.options.labels);
 
+        var ulstyles = { display: 'none' };
+        if(self.options.maxHeight) {
+            ulstyles['max-height'] = self.options.maxHeight;
+        }
+
         // list container
         var list = new Element('ul', {
-            'styles': { display: 'none' },
+            'styles': ulstyles,
             'events': {
                 'mouseenter': function() { self.action = 'open'; },
                 'mouseleave': function() {
