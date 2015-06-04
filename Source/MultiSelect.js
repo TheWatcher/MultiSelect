@@ -78,13 +78,14 @@ var MultiSelect = new Class({
         }
 
         // list container
-        var list = new Element('ul', {
+        self.list = new Element('ul', {
             'styles': ulstyles,
+            'class': 'MultiSelectList',
             'events': {
                 'mouseenter': function() { self.action = 'open'; },
                 'mouseleave': function() {
                     self.action = 'close';
-                    self.itemHover(this, 'none');
+                    self.itemHover('none');
                 },
 
                 'mousedown': function(e) { e.stop(); }, // stop text selection
@@ -92,14 +93,44 @@ var MultiSelect = new Class({
 
                 'keydown': function(e) {
                     if (e.key == 'esc') {
-                        self.toggleMenu('close', monitor, this);
+                        self.closeMenu();
                     }
                     else if (e.key == 'down' || e.key == 'up') {
-                        self.itemHover(this, e.key);
+                        self.itemHover(e.key);
                     }
                 }
             }
         });
+
+        // list monitor
+        self.monitor = new Element('div', {
+            'class': self.options.monitorClass,
+            'html': '<div><div>' + self.changeMonitorValue() + '</div></div>',
+            'tabindex': 0,
+            'events': {
+                'mouseenter': function() { self.action = 'open'; },
+                'mouseleave': function() { self.action = 'close'; },
+                'click': function() {
+
+                    if (this.hasClass(self.options.monitorActiveClass)) {
+                        self.closeMenu();
+                    }
+                    else {
+                        self.openMenu();
+                    }
+                },
+                'keydown': function(e) {
+                    if (e.key == 'space' || e.key == 'down' || e.key == 'up') {
+                        self.action = 'close';
+                        self.openMenu();
+                    }
+                },
+
+                'mousedown': function(e) { e.stop(); }, // stop text selection
+                'selectstart': function() { return false; } // stop IE text selection
+            }
+        });
+
         // list items
         boxes.each(function(box, i) {
             box.addEvents({
@@ -109,10 +140,10 @@ var MultiSelect = new Class({
                 'keydown': function(e) {
                     if (e.key == 'space') {
                         self.active = true;
-                        self.changeItemState(this.getParent(), this, monitor);
+                        self.changeItemState(this.getParent(), this);
                     }
                     if (self.active && (e.key == 'down' || e.key == 'up')) {
-                        self.changeItemState(this.getParent(), this, monitor);
+                        self.changeItemState(this.getParent(), this);
                     }
                 },
                 'keyup': function(e) {
@@ -127,65 +158,40 @@ var MultiSelect = new Class({
                 'events': {
                     'mouseenter': function() {
                         if (self.active === true) {
-                            self.changeItemState(this, box, monitor);
+                            self.changeItemState(this, box);
                         }
-                        self.itemHover(list, this);
+                        self.itemHover(this);
                     },
                     'mousedown': function() {
                         self.active = true;
-                        self.changeItemState(this, box, monitor);
+                        self.changeItemState(this, box);
                     }
                 }
-            }).adopt([box, label]).inject(list);
+            }).adopt([box, label]).inject(self.list);
         });
-        // list monitor
-        var monitor = new Element('div', {
-            'class': self.options.monitorClass,
-            'html': '<div><div>' + self.changeMonitorValue(list) + '</div></div>',
-            'tabindex': 0,
-            'events': {
-                'mouseenter': function() { self.action = 'open'; },
-                'mouseleave': function() { self.action = 'close'; },
-                'click': function() {
 
-                    if (this.hasClass(self.options.monitorActiveClass)) {
-                        self.toggleMenu('close', monitor, list);
-                    }
-                    else {
-                        self.toggleMenu('open', monitor, list);
-                    }
-                },
-                'keydown': function(e) {
-                    if (e.key == 'space' || e.key == 'down' || e.key == 'up') {
-                        self.action = 'close';
-                        self.toggleMenu('open', monitor, list);
-                    }
-                },
-
-                'mousedown': function(e) { e.stop(); }, // stop text selection
-                'selectstart': function() { return false; } // stop IE text selection
-            }
-        });
         // 'global' events
         document.addEvents({
             'mouseup': function() { self.active = false; },
             'click': function() {
                 if (self.action == 'close') {
-                    self.toggleMenu('close', monitor, list);
+                    self.closeMenu();
                 }
             },
             'keydown': function(e) {
                 if (e.key == 'esc') {
-                    self.toggleMenu('close', monitor, list);
-                    self.itemHover(list, 'none');
+                    self.closeMenu();
+                    self.itemHover('none');
                 }
                 if (self.state == 'opened' && (e.key == 'down' || e.key == 'up')) {
                     e.stop();
                 }
             }
         });
+
         // replace element content
-        element.empty().adopt([monitor, list]);
+        element.empty().adopt(self.monitor);
+        document.body.adopt(self.list);
     },
 
     append: function(selector) {
@@ -197,7 +203,7 @@ var MultiSelect = new Class({
         }, this);
     },
 
-    changeItemState: function(item, checkbox, monitor) {
+    changeItemState: function(item, checkbox) {
         if (item.hasClass(this.options.itemSelectedClass)) {
             item.removeClass(this.options.itemSelectedClass);
             checkbox.set('checked', false).focus();
@@ -207,12 +213,12 @@ var MultiSelect = new Class({
             checkbox.set('checked', true).focus();
         }
 
-        monitor.set('html', '<div><div>' + this.changeMonitorValue(item.getParent()) + '</div></div>');
+        this.monitor.set('html', '<div><div>' + this.changeMonitorValue(item.getParent()) + '</div></div>');
         this.fireEvent('itemChanged', checkbox);
     },
 
-    changeMonitorValue: function(list) {
-        var elems = list.getElements(this.options.boxes).filter(function(box) {
+    changeMonitorValue: function() {
+        var elems = this.list.getElements(this.options.boxes).filter(function(box) {
             return box.get('checked');
         });
 
@@ -237,26 +243,26 @@ var MultiSelect = new Class({
         }
     },
 
-    itemHover: function(list, select) {
-        var current = list.getElement('li.'+this.options.itemHoverClass);
+    itemHover: function(select) {
+        var current = this.list.getElement('li.'+this.options.itemHoverClass);
 
         switch (select) {
             case 'down':
                 if (current && (sibling = current.getNext())) current.removeClass(this.options.itemHoverClass);
-                else this.itemHover(list, 'last');
+                else this.itemHover('last');
                 break;
              case 'up':
                 if (current && (sibling = current.getPrevious())) current.removeClass(this.options.itemHoverClass);
-                else this.itemHover(list, 'first');
+                else this.itemHover('first');
                 break;
             case 'none':
-                list.getElements('li.'+this.options.itemHoverClass).removeClass(this.options.itemHoverClass);
+                this.list.getElements('li.'+this.options.itemHoverClass).removeClass(this.options.itemHoverClass);
                 break;
             case 'first':
-                var sibling = list.getFirst();
+                var sibling = this.list.getFirst();
                 break;
             case 'last':
-                var sibling = list.getLast();
+                var sibling = this.list.getLast();
                 break;
             default:
                 if (current) current.removeClass(this.options.itemHoverClass);
@@ -268,28 +274,37 @@ var MultiSelect = new Class({
             sibling.addClass(this.options.itemHoverClass).getElement(this.options.boxes).focus();
     },
 
-    toggleMenu: function(toggle, monitor, list) {
-        if (toggle == 'open') {
-            monitor.addClass(this.options.monitorActiveClass);
-            list.setStyle('display', '');
-            this.itemHover(list, 'first');
+    openMenu: function() {
+        this.monitor.addClass(this.options.monitorActiveClass);
 
-            this.state = 'opened';
+        // The menu needs to be positioned, and to do that we need the location
+        // and size of the monitor box...
+        var position = this.monitor.getPosition();
+        var size     = this.monitor.getSize();
 
-            this.fireEvent('listOpen', monitor.getParent());
-        }
-        else {
-            // close all MultiSelect menus
-            this.elements.getElement('div.monitor').removeClass(this.options.monitorActiveClass);
-            this.elements.getElement('ul').setStyle('display', 'none');
+        this.list.setStyles({'display': 'block',
+                             'position': 'absolute',
+                             'left': position.x,
+                             'top': position.y + size.y,
+                             'width': size.x});
+        this.itemHover('first');
 
-            this.action = 'open';
-            this.state = 'closed';
+        this.state = 'opened';
 
-            this.fireEvent('listClose', monitor.getParent());
-        }
+        this.fireEvent('listOpen', this.monitor.getParent());
 
-        if (list.getScrollSize().y > (list.getStyle('max-height').toInt() ? list.getStyle('max-height').toInt() : list.getStyle('height').toInt()))
-            list.setStyle('overflow-y', 'scroll');
+        var height = this.list.getStyle('max-height').toInt() ? this.list.getStyle('max-height').toInt() : this.list.getStyle('height').toInt();
+        if(this.list.getScrollSize().y > height)
+            this.list.setStyle('overflow-y', 'scroll');
+    },
+
+    closeMenu: function() {
+        this.monitor.removeClass(this.options.monitorActiveClass);
+        this.list.setStyle('display', 'none');
+
+        this.action = 'open';
+        this.state = 'closed';
+
+        this.fireEvent('listClose', this.monitor.getParent());
     }
 });

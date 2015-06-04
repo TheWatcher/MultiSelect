@@ -70,7 +70,7 @@
 .MultiSelect.chromelike .monitor:hover div { background: url("img/chromelike/monitor-right-hover.png") top right no-repeat; }
 .MultiSelect.chromelike .monitor:hover div div { background: url("img/chromelike/monitor-center-hover.png") top right repeat-x; }
 
-.MultiSelect ul {
+ul.MultiSelectList {
 	position: absolute;
 	z-index: 1000;
 	top: 18px;
@@ -88,12 +88,17 @@
 	border-bottom: 1px solid #000;
 	_height: 230px; /* IE */
 }
-.MultiSelect ul li {
-	padding: 0px 3px;
+ul.MultiSelectList li {
+	padding: 2px;
+    white-space: nowrap;
 }
-.MultiSelect ul li.hover,
-.MultiSelect ul li.selected.hover {
+ul.MultiSelectList li.hover,
+ul.MultiSelectList li.selected.hover {
 	background-color: #C8DAF7;
 }
-.MultiSelect ul li.selected {
+ul.MultiSelectList li.selected {
+}
+ul.MultiSelectList li label {
+	font-weight: normal;
+    font-size: 100%;
 }
