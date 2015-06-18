@@ -35,7 +35,9 @@ var MultiSelect = new Class({
         itemHoverClass: 'hover',        // list item hover CSS class - usually we would use CSS :hover pseudo class, but we need this for keyboard navigation functionality
         maxMonitorText: 16,             // How long, in characters, should the monitor text be
         emptyText: "Select options...", // String used when no options are set
-        maxHeight: undefined            // How tall can the multiselect box be? undef = use css default
+        maxHeight: undefined,           // How tall can the multiselect box be? undef = use css default
+        form: undefined,                // Which form is this attached to?
+        phpnames: false                 // If true, [] is added to hidden input names.
         /* Events:
         onItemChanged:  Fired whenever a checkbox in the list is changed
         onListOpen:     Fired after the list is opened
@@ -46,6 +48,10 @@ var MultiSelect = new Class({
     initialize: function(selector, options) {
         // set options
         this.setOptions(options);
+
+        // Ensure the form is a usable element.
+        if(this.options.form !== undefined)
+            this.options.form = $(this.options.form)
 
         // set global action variables
         this.active = false;
@@ -168,6 +174,21 @@ var MultiSelect = new Class({
                     }
                 }
             }).adopt([box, label]).inject(self.list);
+
+            // If a form has been set, we need to include hidden values...
+            if(self.options.form) {
+                var name = box.get('name');
+
+                // Handle php weirdness.
+                if(self.options.phpnames && name.substr(-2) !== "[]") name += "[]";
+
+                new Element('input', {
+                    'type': 'hidden',
+                    'id': 'form-' + box.get('id'),
+                    'name': name,
+                    'value':  box.get('checked') ? box.get('value') : '',
+                }).inject(self.options.form);
+            }
         });
 
         // 'global' events
@@ -192,6 +213,7 @@ var MultiSelect = new Class({
         // replace element content
         element.empty().adopt(self.monitor);
         document.body.adopt(self.list);
+        self.update();
     },
 
     append: function(selector) {
@@ -213,7 +235,7 @@ var MultiSelect = new Class({
             checkbox.set('checked', true).focus();
         }
 
-        this.monitor.set('html', '<div><div>' + this.changeMonitorValue(item.getParent()) + '</div></div>');
+        this.update();
         this.fireEvent('itemChanged', checkbox);
     },
 
@@ -302,9 +324,20 @@ var MultiSelect = new Class({
         this.monitor.removeClass(this.options.monitorActiveClass);
         this.list.setStyle('display', 'none');
 
+        if(this.options.form) {
+            this.list.getElements('input').each(function(elem) {
+                var value = elem.checked ? elem.get('value') : '';
+                $('form-' + elem.get('id')).set('value', value);
+            });
+        }
+
         this.action = 'open';
         this.state = 'closed';
 
         this.fireEvent('listClose', this.monitor.getParent());
+    },
+
+    update: function() {
+        this.monitor.set('html', '<div><div>' + this.changeMonitorValue() + '</div></div>');
     }
 });
