@@ -103,3 +103,8 @@ ul.MultiSelectList li label {
 	font-weight: normal;
     font-size: 100%;
 }
+
+ul.MultiSelectList li label.highlight {
+    color: #880000;
+    font-weight: bold;
+}
